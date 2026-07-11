@@ -363,7 +363,7 @@ Seluruh pengembangan tersebut ditambahkan tanpa mengubah alur **Workflow Approva
 
 S1 Sistem Informasi - Universitas Galuh
 
-GitHub : https://github.com/ariyahandikam
-Email  : ariyahandika04@gmail.com
-Alamat : Ciamis
-NoHP   : 085624440728
+- **Email** : ariyahandika04@gmail.com
+- **Alamat** : Ciamis, Jawa Barat
+- **No. HP** : 085624440728
+- **GitHub** : https://github.com/ariyahandikam
