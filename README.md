@@ -322,6 +322,8 @@ http://127.0.0.1:8000
 | Direktur | direktur@test.com | password |
 | Finance | finance@test.com | password |
 
+> Catatan: jika ingin ada notifikasi email, maka ganti emailnya dengan email aktif.
+
 ---
 
 # 📂 Struktur Folder
