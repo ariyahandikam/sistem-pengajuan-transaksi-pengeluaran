@@ -13,6 +13,7 @@ Sistem menerapkan **Role-Based Access Control (RBAC)** sehingga setiap pengguna 
 - Laravel 13
 - PHP 8.3
 - MySQL
+- Laravel Breeze
 - Bootstrap 5
 - HTML5
 - CSS3
@@ -29,9 +30,12 @@ Sistem menerapkan **Role-Based Access Control (RBAC)** sehingga setiap pengguna 
 
 ## Authentication
 
+Authentication dibangun menggunakan **Laravel Breeze**.
+
 - Login
 - Logout
-- Role Based Access Control (RBAC)
+- Session Authentication
+- Role-Based Access Control (RBAC) menggunakan Spatie Laravel Permission
 
 ---
 
