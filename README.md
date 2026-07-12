@@ -205,21 +205,29 @@ Dengan mekanisme ini setiap pihak yang terlibat akan menerima informasi secara o
 
 # 🗄️ Struktur Database
 
-Tabel utama yang digunakan:
+### Tabel Utama
 
 | Tabel | Deskripsi |
 |--------|-----------|
-| users | Data pengguna |
-| roles | Data role |
-| permissions | Data permission |
-| submissions | Data pengajuan |
-| approvals | Riwayat approval |
-| categories | Master kategori |
-| budgets | Master budget |
-| payments | Data pembayaran |
-| activity_log | Activity Log |
+| users | Data pengguna dengan kolom `role_id` untuk role primary |
+| roles | Master role (Staff, Supervisor, Manager, Direktur, Finance, Admin) |
+| submissions | Data pengajuan transaksi pengeluaran |
+| approvals | Riwayat approval dengan multi-level workflow |
+| categories | Master kategori pengajuan |
+| budgets | Master budget per kategori per tahun |
+| payments | Data pembayaran yang sudah di-approve |
+| activity_log | Activity Log untuk audit trail |
 
-> **Catatan:** Package **Spatie Laravel Permission** secara otomatis membuat tabel pendukung seperti `model_has_roles`, `model_has_permissions`, dan `role_has_permissions` untuk mengelola Role-Based Access Control (RBAC).
+### Tabel Spatie Laravel Permission
+
+| Tabel | Deskripsi |
+|--------|-----------|
+| permissions | Master permission untuk fine-grained access control |
+| role_has_permissions | Pivot table relasi Many-to-Many antara `roles` dan `permissions` |
+| model_has_roles | Pivot table relasi Many-to-Many antara `users` dan `roles` |
+| model_has_permissions | Direct permission assignment untuk users |
+
+> **Catatan:** Package **Spatie Laravel Permission** secara otomatis membuat dan mengelola tabel pivot (`model_has_roles`, `model_has_permissions`, dan `role_has_permissions`) untuk mengelola Role-Based Access Control (RBAC) yang lebih fleksibel dan scalable.
 ---
 
 # 🔗 Database Relationship
@@ -228,34 +236,127 @@ Relasi antar tabel pada sistem adalah sebagai berikut.
 
 | Relasi | Jenis | Keterangan |
 |--------|-------|------------|
-| Roles → Users | One-to-Many | Satu role dapat dimiliki oleh banyak user. |
-| Users → Submissions | One-to-Many | Satu user dapat membuat banyak pengajuan. |
+| Roles ↔ Users | Many-to-Many | Menggunakan tabel pivot `model_has_roles` dari Spatie Laravel Permission. Satu user dapat memiliki banyak role, dan satu role dapat dimiliki oleh banyak user. |
+| Users → Submissions | One-to-Many | Satu user (staff) dapat membuat banyak pengajuan. |
 | Categories → Submissions | One-to-Many | Satu kategori dapat digunakan oleh banyak pengajuan. |
-| Categories → Budgets | One-to-Many | Setiap kategori memiliki data budget. |
-| Submissions → Approvals | One-to-Many | Satu pengajuan memiliki beberapa riwayat approval. |
-| Users → Approvals | One-to-Many | User dapat melakukan banyak approval sesuai role. |
-| Submissions → Payments | One-to-One | Setiap pengajuan memiliki satu data pembayaran. |
-| Users → Payments | One-to-Many | Finance dapat memproses banyak pembayaran. |
+| Categories → Budgets | One-to-Many | Satu kategori memiliki data budget per tahun. |
+| Submissions → Approvals | One-to-Many | Satu pengajuan memiliki beberapa riwayat approval (multi-level workflow). |
+| Users → Approvals | One-to-Many | User dapat melakukan banyak approval sesuai role (nullable saat pending). |
+| Submissions → Payments | One-to-One | Setiap pengajuan memiliki satu data pembayaran (unique constraint). |
+| Users → Payments | One-to-Many | Finance user dapat memproses banyak pembayaran. |
+| Roles ↔ Permissions | Many-to-Many | Menggunakan tabel pivot `role_has_permissions` dari Spatie Laravel Permission. |
 
 ### Entity Relationship Diagram (ERD)
 
 ```
-roles
-   │
-   └──────< users
-               │
-               ├────────< submissions >──────── categories
-               │               │                     │
-               │               │                     └──────< budgets
-               │               │
-               │               ├────────< approvals
-               │               │              │
-               │               │              └──── approved by users
-               │               │
-               │               └──────── payments
-               │
-               └────────< payments
+                            permissions
+                                 │
+                                 │
+                         role_has_permissions
+                                 │
+                            roles
+                                 │
+                        model_has_roles
+                                 │
+                            users
+                 ┌──────────────┬─────────────┐
+                 │              │             │
+                 │              │             └──────────< payments
+                 │              │                          │
+                 │              │                          └── processed_by
+                 │              │
+                 └────────< submissions >──────────── categories
+                                 │                         │
+                                 │                         └───< budgets
+                                 │
+                         └────< approvals >────────── users
+                                               (approved_by)
 ```
+
+### Foreign Keys
+
+| Tabel | Foreign Key | Referensi |
+|--------|-------------|-----------|
+| `users` | `role_id` | `roles.id` |
+| `submissions` | `user_id` | `users.id` |
+| `submissions` | `category_id` | `categories.id` |
+| `budgets` | `category_id` | `categories.id` |
+| `approvals` | `submission_id` | `submissions.id` |
+| `approvals` | `user_id` | `users.id` (nullable) |
+| `payments` | `submission_id` | `submissions.id` (unique) |
+| `payments` | `user_id` | `users.id` |
+| `model_has_roles` | `role_id`, `model_id` | `roles.id`, `users.id` |
+| `role_has_permissions` | `role_id`, `permission_id` | `roles.id`, `permissions.id` |
+| `model_has_permissions` | `permission_id`, `model_id` | `permissions.id`, `users.id` |
+
+### Column Details
+
+#### Tabel `roles`
+| Kolom | Tipe | Deskripsi |
+|--------|------|-----------|
+| `id` | bigint | Primary key |
+| `name` | string | Nama role (e.g., "Staff", "Supervisor", "Manager", "Direktur", "Finance", "Admin") |
+| `guard_name` | string | Guard name dari Spatie (default: "web") |
+| `slug` | string | Slug unik untuk identifikasi (e.g., "staff", "spv", "manager") |
+| `timestamps` | - | `created_at`, `updated_at` |
+
+#### Tabel `submissions`
+| Kolom | Tipe | Deskripsi |
+|--------|------|-----------|
+| `id` | bigint | Primary key |
+| `submission_number` | string | Nomor pengajuan unik (format: TRX-YYYYMMDD-XXXX) |
+| `submission_date` | date | Tanggal pengajuan |
+| `user_id` | bigint FK | Staff yang membuat pengajuan |
+| `category_id` | bigint FK | Kategori pengajuan |
+| `amount` | decimal(15,2) | Nominal pengajuan |
+| `description` | text | Deskripsi / keterangan |
+| `attachment` | json | Path file lampiran (JSON array) |
+| `status` | string | Status: draft, submitted, waiting_spv, waiting_manager, waiting_direktur, waiting_finance, paid, rejected |
+| `timestamps` | - | `created_at`, `updated_at` |
+
+#### Tabel `approvals`
+| Kolom | Tipe | Deskripsi |
+|--------|------|-----------|
+| `id` | bigint | Primary key |
+| `submission_id` | bigint FK | Referensi ke pengajuan |
+| `user_id` | bigint FK (nullable) | User yang melakukan approval (null jika pending) |
+| `role` | string | Role approver (e.g., "spv", "manager", "direktur", "finance") |
+| `status` | string | Status: pending, approved, rejected |
+| `notes` | text | Catatan approval / reject (opsional) |
+| `approved_at` | timestamp | Waktu approval |
+| `timestamps` | - | `created_at`, `updated_at` |
+
+#### Tabel `payments`
+| Kolom | Tipe | Deskripsi |
+|--------|------|-----------|
+| `id` | bigint | Primary key |
+| `submission_id` | bigint FK (unique) | Referensi ke pengajuan (one-to-one) |
+| `user_id` | bigint FK | Finance user yang memproses pembayaran |
+| `amount` | decimal(15,2) | Nominal pembayaran |
+| `payment_date` | date | Tanggal pembayaran |
+| `payment_method` | string | Metode: transfer, cash |
+| `reference_number` | string | Nomor referensi / bukti pembayaran |
+| `notes` | text | Catatan pembayaran (opsional) |
+| `timestamps` | - | `created_at`, `updated_at` |
+
+#### Tabel `categories`
+| Kolom | Tipe | Deskripsi |
+|--------|------|-----------|
+| `id` | bigint | Primary key |
+| `name` | string | Nama kategori |
+| `is_po_produk` | boolean | Flag untuk kategori "PO Produk" (memiliki workflow khusus) |
+| `timestamps` | - | `created_at`, `updated_at` |
+
+#### Tabel `budgets`
+| Kolom | Tipe | Deskripsi |
+|--------|------|-----------|
+| `id` | bigint | Primary key |
+| `category_id` | bigint FK | Referensi ke kategori |
+| `year` | year | Tahun budget |
+| `total_budget` | decimal(15,2) | Total budget tahun tersebut |
+| `used_budget` | decimal(15,2) | Budget yang sudah digunakan |
+| `timestamps` | - | `created_at`, `updated_at` |
+| **Unique** | `(category_id, year)` | Kombinasi unik per kategori per tahun |
 
 ---
 # ⚙️ Cara Instalasi
