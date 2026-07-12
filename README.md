@@ -358,7 +358,11 @@ http://127.0.0.1:8000
 | Direktur | direktur@test.com | password |
 | Finance | finance@test.com | password |
 
-> Catatan: jika ingin ada notifikasi email, maka ganti emailnya dengan email aktif.
+> **Catatan:**
+>
+> - Untuk menguji fitur **Email Notification**, gunakan alamat email yang aktif.
+> - Apabila email tidak ditemukan di **Inbox**, silakan periksa folder **Spam/Junk**.
+> - Domain pengirim menggunakan domain yang relatif baru sehingga beberapa penyedia layanan email (misalnya Gmail atau Outlook) dapat mengklasifikasikan email sebagai **Spam** hingga reputasi domain meningkat. Hal ini tidak memengaruhi fungsi pengiriman email pada aplikasi.
 
 ---
 
