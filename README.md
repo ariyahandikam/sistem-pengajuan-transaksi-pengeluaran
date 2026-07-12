@@ -18,6 +18,7 @@ Sistem menerapkan **Role-Based Access Control (RBAC)** sehingga setiap pengguna 
 - CSS3
 - JavaScript
 - Spatie Laravel Permission
+- Spatie Activity Log
 - Laravel Mail (Resend)
 - REST API
 - Git & GitHub
@@ -218,6 +219,7 @@ Tabel utama yang digunakan:
 | payments | Data pembayaran |
 | activity_log | Activity Log |
 
+> **Catatan:** Package **Spatie Laravel Permission** secara otomatis membuat tabel pendukung seperti `model_has_roles`, `model_has_permissions`, dan `role_has_permissions` untuk mengelola Role-Based Access Control (RBAC).
 ---
 
 # 🔗 Database Relationship
@@ -261,13 +263,13 @@ roles
 Clone repository
 
 ```bash
-git clone https://github.com/USERNAME/employee-test.git
+git clone https://github.com/ariyahandikam/sistem-pengajuan-transaksi-pengeluaran.git
 ```
 
 Masuk ke folder project
 
 ```bash
-cd employee-test
+cd sistem-pengajuan-transaksi-pengeluaran
 ```
 
 Install dependency PHP
@@ -323,17 +325,13 @@ Compile asset
 npm run build
 ```
 
----
-
-# ▶️ Cara Menjalankan Project
-
-Jalankan Laravel
+Jalankan aplikasi
 
 ```bash
 php artisan serve
 ```
 
-Jalankan Vite
+Untuk development, jalankan Vite pada terminal terpisah
 
 ```bash
 npm run dev
@@ -344,6 +342,12 @@ Buka browser
 ```
 http://127.0.0.1:8000
 ```
+
+---
+
+# 📄 License
+
+Project ini dibuat sebagai pemenuhan **Tes Karyawan IT – Web Application Developer** dan digunakan sebagai portofolio pengembangan aplikasi berbasis Laravel.
 
 ---
 
@@ -408,3 +412,4 @@ S1 Sistem Informasi - Universitas Galuh
 - **Alamat** : Ciamis, Jawa Barat
 - **No. HP** : 085624440728
 - **GitHub** : https://github.com/ariyahandikam
+- **LinkedIn** : https://www.linkedin.com/in/ariya-handika-mulyana-5339792a5/
