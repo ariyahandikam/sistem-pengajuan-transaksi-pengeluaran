@@ -220,6 +220,41 @@ Tabel utama yang digunakan:
 
 ---
 
+# 🔗 Database Relationship
+
+Relasi antar tabel pada sistem adalah sebagai berikut.
+
+| Relasi | Jenis | Keterangan |
+|--------|-------|------------|
+| Roles → Users | One-to-Many | Satu role dapat dimiliki oleh banyak user. |
+| Users → Submissions | One-to-Many | Satu user dapat membuat banyak pengajuan. |
+| Categories → Submissions | One-to-Many | Satu kategori dapat digunakan oleh banyak pengajuan. |
+| Categories → Budgets | One-to-Many | Setiap kategori memiliki data budget. |
+| Submissions → Approvals | One-to-Many | Satu pengajuan memiliki beberapa riwayat approval. |
+| Users → Approvals | One-to-Many | User dapat melakukan banyak approval sesuai role. |
+| Submissions → Payments | One-to-One | Setiap pengajuan memiliki satu data pembayaran. |
+| Users → Payments | One-to-Many | Finance dapat memproses banyak pembayaran. |
+
+### Entity Relationship Diagram (ERD)
+
+```
+roles
+   │
+   └──────< users
+               │
+               ├────────< submissions >──────── categories
+               │               │                     │
+               │               │                     └──────< budgets
+               │               │
+               │               ├────────< approvals
+               │               │              │
+               │               │              └──── approved by users
+               │               │
+               │               └──────── payments
+               │
+               └────────< payments
+
+---
 # ⚙️ Cara Instalasi
 
 Clone repository
