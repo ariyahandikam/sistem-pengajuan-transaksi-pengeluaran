@@ -361,6 +361,7 @@ http://127.0.0.1:8000
 > **Catatan:**
 >
 > - Untuk menguji fitur **Email Notification**, gunakan alamat email yang aktif.
+> - Mengganti **Email**, bisa lewat profile akun user atau dari akun Admin.
 > - Apabila email tidak ditemukan di **Inbox**, silakan periksa folder **Spam/Junk**.
 > - Domain pengirim menggunakan domain yang relatif baru sehingga beberapa penyedia layanan email (misalnya Gmail atau Outlook) dapat mengklasifikasikan email sebagai **Spam** hingga reputasi domain meningkat. Hal ini tidak memengaruhi fungsi pengiriman email pada aplikasi.
 

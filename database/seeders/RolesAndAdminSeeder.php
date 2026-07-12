@@ -26,12 +26,11 @@ class RolesAndAdminSeeder extends Seeder
         }
 
         // Create admin user if not exists
-        $adminEmail = env('ADMIN_EMAIL', 'admin@example.com');
         $admin = User::firstOrCreate(
-            ['email' => $adminEmail],
+            ['email' => 'admin@test.com'],
             [
-                'name' => env('ADMIN_NAME', 'Administrator'),
-                'password' => bcrypt(env('ADMIN_PASSWORD', 'password')),
+                'name' => 'Admin',
+                'password' => bcrypt('password'),
                 'status' => 'active',
             ]
         );

@@ -12,11 +12,11 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $users = [
-            ['name' => 'Staff Demo',    'email' => 'staff@company.com',    'role' => 'staff'],
-            ['name' => 'SPV Demo',      'email' => 'spv@company.com',      'role' => 'spv'],
-            ['name' => 'Manager Demo',  'email' => 'manager@company.com',  'role' => 'manager'],
-            ['name' => 'Direktur Demo', 'email' => 'direktur@company.com', 'role' => 'direktur'],
-            ['name' => 'Finance Demo',  'email' => 'finance@company.com',  'role' => 'finance'],
+            ['name' => 'Staff',    'email' => 'staff@test.com',    'role' => 'staff'],
+            ['name' => 'SPV',      'email' => 'spv@test.com',      'role' => 'spv'],
+            ['name' => 'Manager',  'email' => 'manager@test.com',  'role' => 'manager'],
+            ['name' => 'Direktur', 'email' => 'direktur@test.com', 'role' => 'direktur'],
+            ['name' => 'Finance',  'email' => 'finance@test.com',  'role' => 'finance'],
         ];
 
         foreach ($users as $userData) {
