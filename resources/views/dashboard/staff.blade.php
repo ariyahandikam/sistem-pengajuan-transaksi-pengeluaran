@@ -34,7 +34,7 @@
             <div class="card summary-card shadow-sm accent-danger">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div class="me-3">
-                        <div class="summary-title text-muted">Ditolak</div>
+                        <div class="summary-title text-muted">Rejected</div>
                         <div class="summary-value text-dark" data-target="{{ $ditolak }}">0</div>
                     </div>
                     <div class="summary-icon">
@@ -48,7 +48,7 @@
             <div class="card summary-card shadow-sm accent-success">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <div class="me-3">
-                        <div class="summary-title text-muted">Selesai (Paid)</div>
+                        <div class="summary-title text-muted">Paid</div>
                         <div class="summary-value text-dark" data-target="{{ $paid }}">0</div>
                     </div>
                     <div class="summary-icon">

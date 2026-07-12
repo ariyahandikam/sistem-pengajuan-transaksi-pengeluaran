@@ -69,11 +69,17 @@
                             <li class="list-group-item p-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <span class="fw-bold">{{ ucfirst($approval->role) }}</span>
-                                    @if($approval->isApproved())
-                                        <span class="badge bg-success">Disetujui</span>
-                                    @else
-                                        <span class="badge bg-danger">Ditolak</span>
-                                    @endif
+                                    @php
+                                        if ($approval->isApproved()) {
+                                            $isFinancePaid = ($approval->role === 'finance') && $submission->status === \App\Models\Submission::STATUS_PAID;
+                                            $approvalLabel = $isFinancePaid ? 'Paid' : 'Approved';
+                                            $badgeClass = 'bg-success';
+                                        } else {
+                                            $approvalLabel = 'Rejected';
+                                            $badgeClass = 'bg-danger';
+                                        }
+                                    @endphp
+                                    <span class="badge {{ $badgeClass }}">{{ $approvalLabel }}</span>
                                 </div>
                                 <div class="text-muted small mb-2">
                                     Oleh: {{ $approval->user->name ?? 'System' }}<br>
@@ -299,6 +305,15 @@
                 if (!approvalActionInput.value) {
                     return;
                 }
+
+                // Prevent double clicks: disable the button and show a small spinner
+                const btn = this;
+                if (btn.disabled) return;
+                btn.disabled = true;
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sedang diproses...';
+
+                // Submit the form after disabling to avoid duplicate submissions
                 approvalForm.submit();
             });
         });

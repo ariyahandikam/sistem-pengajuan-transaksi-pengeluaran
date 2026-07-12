@@ -128,9 +128,17 @@
                                                         Oleh: <strong>{{ $approval->user->name ?? 'System' }}</strong>
                                                     </small>
                                                 </div>
-                                                <span class="badge {{ $approval->isApproved() ? 'bg-success' : 'bg-danger' }}">
-                                                    {{ $approval->isApproved() ? 'Disetujui' : 'Ditolak' }}
-                                                </span>
+                                                @php
+                                                    if ($approval->isApproved()) {
+                                                        $isFinancePaid = ($approval->role === 'finance') && $submission->status === \App\Models\Submission::STATUS_PAID;
+                                                        $label = $isFinancePaid ? 'Paid' : 'Approved';
+                                                        $badge = 'bg-success';
+                                                    } else {
+                                                        $label = 'Rejected';
+                                                        $badge = 'bg-danger';
+                                                    }
+                                                @endphp
+                                                <span class="badge {{ $badge }}">{{ $label }}</span>
                                             </div>
                                             <small class="text-muted d-block mb-2">
                                                 <i class="bi bi-calendar-event me-1"></i>{{ $approval->approved_at->format('d/m/Y H:i') }}
@@ -194,19 +202,19 @@
                                 @case('approved')
                                     <div class="alert alert-success alert-sm" role="alert">
                                         <i class="bi bi-check-circle me-2"></i>
-                                        <strong>Disetujui</strong> - Pengajuan telah disetujui semua.
+                                        <strong>Approved</strong> - The submission has been fully approved.
                                     </div>
                                     @break
                                 @case('rejected')
                                     <div class="alert alert-danger alert-sm" role="alert">
                                         <i class="bi bi-x-circle me-2"></i>
-                                        <strong>Ditolak</strong> - Pengajuan ditolak. Hubungi supervisor.
+                                        <strong>Rejected</strong> - The submission was rejected. Contact your supervisor.
                                     </div>
                                     @break
                                 @case('paid')
                                     <div class="alert alert-success alert-sm" role="alert">
                                         <i class="bi bi-cash-coin me-2"></i>
-                                        <strong>Dibayar</strong> - Pengajuan telah dibayarkan.
+                                        <strong>Paid</strong> - The submission has been paid.
                                     </div>
                                     @break
                             @endswitch

@@ -89,13 +89,13 @@ class Submission extends Model
     {
         return match ($this->status) {
             self::STATUS_DRAFT            => 'Draft',
-            self::STATUS_SUBMITTED        => 'Disubmit',
+            self::STATUS_SUBMITTED        => 'Submitted',
             self::STATUS_WAITING_SPV      => 'Waiting SPV Approval',
             self::STATUS_WAITING_MANAGER  => 'Waiting Manager Approval',
             self::STATUS_WAITING_DIREKTUR => 'Waiting Director Approval',
             self::STATUS_WAITING_FINANCE  => 'Waiting Finance Approval',
-            self::STATUS_PAID             => 'Dibayar (Paid)',
-            self::STATUS_REJECTED         => 'Ditolak',
+            self::STATUS_PAID             => 'Paid',
+            self::STATUS_REJECTED         => 'Rejected',
             default                       => ucfirst($this->status),
         };
     }

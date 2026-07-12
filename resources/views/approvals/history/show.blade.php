@@ -40,7 +40,14 @@
                                 <div class="d-flex justify-content-between">
                                     <div>
                                         <strong>{{ ucfirst($ap->role) }}:</strong> {{ $ap->user->name ?? 'System' }}
-                                        <div class="text-muted">{{ $ap->status === 'approved' ? 'Approved' : 'Rejected' }}</div>
+                                        @php
+                                            $statusLabel = 'Rejected';
+                                            if ($ap->status === 'approved') {
+                                                $isFinancePaid = ($ap->role === 'finance') && optional($ap->submission)->status === \App\Models\Submission::STATUS_PAID;
+                                                $statusLabel = $isFinancePaid ? 'Paid' : 'Approved';
+                                            }
+                                        @endphp
+                                        <div class="text-muted">{{ $statusLabel }}</div>
                                     </div>
                                     <div class="text-end">
                                         <small class="text-muted">{{ optional($ap->approved_at)->format('Y-m-d H:i') ?? '-' }}</small>

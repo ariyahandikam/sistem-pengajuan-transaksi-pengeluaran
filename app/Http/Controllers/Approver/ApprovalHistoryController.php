@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Approver;
 
 use App\Http\Controllers\Controller;
 use App\Models\Approval;
+use Illuminate\Support\Facades\DB;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,13 @@ class ApprovalHistoryController extends Controller
         // Role-specific rules
         if ($role === 'spv' || $role === 'manager' || $role === 'finance') {
             $query->where('user_id', $user->id)->where('role', $role);
+        } elseif ($role === 'direktur') {
+            $query->whereIn('id', function ($subquery) {
+                $subquery->selectRaw('MAX(id)')
+                    ->from('approvals')
+                    ->whereIn('status', [Approval::STATUS_APPROVED, Approval::STATUS_REJECTED])
+                    ->groupBy('submission_id');
+            });
         }
 
         // Filters
@@ -31,7 +39,25 @@ class ApprovalHistoryController extends Controller
         }
 
         if ($status = $request->query('status')) {
-            $query->where('status', $status);
+            if ($status === 'paid') {
+                // Show approvals that are approved and whose submission is paid
+                $query->where('status', Approval::STATUS_APPROVED)
+                      ->whereHas('submission', function ($q) {
+                          $q->where('status', Submission::STATUS_PAID);
+                      });
+            } elseif ($status === 'approved') {
+                // For director, exclude approvals that belong to submissions already paid
+                if ($role === 'direktur') {
+                    $query->where('status', Approval::STATUS_APPROVED)
+                          ->whereHas('submission', function ($q) {
+                              $q->where('status', '<>', Submission::STATUS_PAID);
+                          });
+                } else {
+                    $query->where('status', Approval::STATUS_APPROVED);
+                }
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         if ($category = $request->query('category')) {

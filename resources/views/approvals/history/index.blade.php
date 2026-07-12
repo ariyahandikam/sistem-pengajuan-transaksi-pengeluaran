@@ -23,8 +23,17 @@
                 <div class="col-12 col-md-4 col-lg-2">
                     <select name="status" class="form-select">
                         <option value="">Semua Status</option>
-                        <option value="approved" {{ request('status')=='approved' ? 'selected' : '' }}>Approved</option>
-                        <option value="rejected" {{ request('status')=='rejected' ? 'selected' : '' }}>Rejected</option>
+                        @if(Auth::user()->roleSlug === 'finance')
+                            <option value="paid" {{ request('status')=='paid' ? 'selected' : '' }}>Paid</option>
+                            <option value="rejected" {{ request('status')=='rejected' ? 'selected' : '' }}>Rejected</option>
+                        @elseif(Auth::user()->roleSlug === 'direktur')
+                            <option value="approved" {{ request('status')=='approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="rejected" {{ request('status')=='rejected' ? 'selected' : '' }}>Rejected</option>
+                            <option value="paid" {{ request('status')=='paid' ? 'selected' : '' }}>Paid</option>
+                        @else
+                            <option value="approved" {{ request('status')=='approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="rejected" {{ request('status')=='rejected' ? 'selected' : '' }}>Rejected</option>
+                        @endif
                     </select>
                 </div>
                 <div class="col-12 col-md-4 col-lg-2">
@@ -60,7 +69,7 @@
                             <th>Pengaju</th>
                             <th>Kategori</th>
                             <th>Nominal</th>
-                            <th>Status Saya</th>
+                            <th>Status</th>
                             <th>Tanggal Proses</th>
                             <th class="text-center pe-4">Aksi</th>
                         </tr>
@@ -90,10 +99,24 @@
                                     <strong class="text-dark">Rp {{ number_format($approval->submission->amount ?? 0, 0, ',', '.') }}</strong>
                                 </td>
                                 <td>
+                                    @php
+                                        $actorName = $approval->user->name ?? 'System';
+                                        $roleLabel = $approval->role ? ucfirst($approval->role) : 'Unknown';
+                                    @endphp
                                     @if($approval->status == 'approved')
-                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">Disetujui</span>
+                                        @php
+                                            $isFinancePaid = ($approval->role === 'finance') && optional($approval->submission)->status === \App\Models\Submission::STATUS_PAID;
+                                        @endphp
+                                        @if($isFinancePaid)
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">Paid</span>
+                                            <div class="text-muted small mt-1">oleh {{ $actorName }} ({{ $roleLabel }})</div>
+                                        @else
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">Approved</span>
+                                            <div class="text-muted small mt-1">oleh {{ $actorName }} ({{ $roleLabel }})</div>
+                                        @endif
                                     @else
-                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">Ditolak</span>
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">Rejected</span>
+                                        <div class="text-muted small mt-1">oleh {{ $actorName }} ({{ $roleLabel }})</div>
                                     @endif
                                 </td>
                                 <td>
