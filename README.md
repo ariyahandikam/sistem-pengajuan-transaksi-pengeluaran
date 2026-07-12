@@ -219,7 +219,6 @@ Tabel utama yang digunakan:
 | activity_log | Activity Log |
 
 ---
----
 
 # 🔗 Database Relationship
 
