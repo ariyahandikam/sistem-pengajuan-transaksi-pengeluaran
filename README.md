@@ -240,6 +240,7 @@ Relasi antar tabel pada sistem adalah sebagai berikut.
 
 | Relasi | Jenis | Keterangan |
 |--------|-------|------------|
+| Users → Roles | Many-to-One | Menggunakan kolom `users.role_id` yang mengacu ke `roles.id` sebagai role utama. |
 | Roles ↔ Users | Many-to-Many | Menggunakan tabel pivot `model_has_roles` dari Spatie Laravel Permission. Satu user dapat memiliki banyak role, dan satu role dapat dimiliki oleh banyak user. |
 | Users → Submissions | One-to-Many | Satu user (staff) dapat membuat banyak pengajuan. |
 | Categories → Submissions | One-to-Many | Satu kategori dapat digunakan oleh banyak pengajuan. |
@@ -252,46 +253,62 @@ Relasi antar tabel pada sistem adalah sebagai berikut.
 
 ### Entity Relationship Diagram (ERD)
 
+#### Versi ASCII
+
 ```
-                            permissions
-                                 │
-                                 │
-                         role_has_permissions
-                                 │
-                            roles
-                                 │
-                        model_has_roles
-                                 │
-                            users
-                 ┌──────────────┬─────────────┐
-                 │              │             │
-                 │              │             └──────────< payments
-                 │              │                          │
-                 │              │                          └── processed_by
-                 │              │
-                 └────────< submissions >──────────── categories
-                                 │                         │
-                                 │                         └───< budgets
-                                 │
-                         └────< approvals >────────── users
-                                               (approved_by)
+permissions
+    │
+    │ role_has_permissions
+    │
+roles
+    │
+    │ users.role_id
+    │
+users
+    ├──< submissions
+    │        │
+    │        └──< approvals
+    │
+    └──< payments
+
+categories
+    ├──< submissions
+    └──< budgets
+```
+
+#### Versi Mermaid
+
+```mermaid
+erDiagram
+    roles ||--o{ users : has_primary_role
+    roles ||--o{ model_has_roles : assigned_to
+    users ||--o{ model_has_roles : has
+    permissions ||--o{ role_has_permissions : granted_to
+    roles ||--o{ role_has_permissions : has
+    users ||--o{ submissions : creates
+    categories ||--o{ submissions : classified_as
+    categories ||--o{ budgets : has_budget
+    submissions ||--o{ approvals : has_history
+    users ||--o{ approvals : approves
+    submissions ||--o| payments : has_one
+    users ||--o{ payments : processes
 ```
 
 ### Foreign Keys
 
-| Tabel | Foreign Key | Referensi |
-|--------|-------------|-----------|
-| `users` | `role_id` | `roles.id` |
-| `submissions` | `user_id` | `users.id` |
-| `submissions` | `category_id` | `categories.id` |
-| `budgets` | `category_id` | `categories.id` |
-| `approvals` | `submission_id` | `submissions.id` |
-| `approvals` | `user_id` | `users.id` (nullable) |
-| `payments` | `submission_id` | `submissions.id` (unique) |
-| `payments` | `user_id` | `users.id` |
-| `model_has_roles` | `role_id`, `model_id` | `roles.id`, `users.id` |
-| `role_has_permissions` | `role_id`, `permission_id` | `roles.id`, `permissions.id` |
-| `model_has_permissions` | `permission_id`, `model_id` | `permissions.id`, `users.id` |
+| Tabel | Foreign Key | Referensi | Keterangan |
+|--------|-------------|-----------|-----------|
+| `users` | `role_id` | `roles.id` | Role utama user. |
+| `submissions` | `user_id` | `users.id` | Staff pemilik pengajuan. |
+| `submissions` | `category_id` | `categories.id` | Kategori pengajuan. |
+| `budgets` | `category_id` | `categories.id` | Budget per kategori. |
+| `approvals` | `submission_id` | `submissions.id` | Riwayat approval tiap pengajuan. |
+| `approvals` | `user_id` | `users.id` (nullable) | User yang melakukan approval. |
+| `payments` | `submission_id` | `submissions.id` (unique) | Pembayaran untuk satu pengajuan. |
+| `payments` | `user_id` | `users.id` | Finance yang memproses pembayaran. |
+| `model_has_roles` | `role_id`, `model_id` | `roles.id`, `users.id` | Relasi many-to-many Spatie. |
+| `role_has_permissions` | `role_id`, `permission_id` | `roles.id`, `permissions.id` | Hak akses role. |
+| `model_has_permissions` | `permission_id`, `model_id` | `permissions.id`, `users.id` | Hak akses khusus user. |
 
 ### Column Details
 
