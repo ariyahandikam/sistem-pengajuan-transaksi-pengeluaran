@@ -345,12 +345,6 @@ http://127.0.0.1:8000
 
 ---
 
-# 📄 License
-
-Project ini dibuat sebagai pemenuhan **Tes Karyawan IT – Web Application Developer** dan digunakan sebagai portofolio pengembangan aplikasi berbasis Laravel.
-
----
-
 # 👤 Akun Login Testing
 
 | Role | Email | Password |
@@ -399,6 +393,12 @@ Selain memenuhi requirement pada soal tes, project ini juga mengimplementasikan 
 - REST API
 
 Seluruh pengembangan tersebut ditambahkan tanpa mengubah alur **Workflow Approval** yang menjadi requirement utama.
+
+---
+
+# 📄 License
+
+Project ini dibuat sebagai pemenuhan **Tes Karyawan IT – Web Application Developer** dan digunakan sebagai portofolio pengembangan aplikasi berbasis Laravel.
 
 ---
 
